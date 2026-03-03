@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# Versovate EMS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Versovate Employee Management System (EMS) is a comprehensive platform designed to streamline HR operations, attendance tracking, and payroll management.
 
-Currently, two official plugins are available:
+## Core Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Attendance Management**:
+    - Weekly timesheets strictly following a **Sunday to Saturday** schedule.
+    - Configurable **Working Days** per employee (managed by Admin).
+    - Automated "Holiday" marking for non-working days.
+    - Visual **Friday Reminder** for weekly attendance submission.
 
-## React Compiler
+- **Compensation & Payroll**:
+    - Automated salary breakdown from Gross Monthly CTC.
+    - **Manual EPF Overrides**: Admins can set custom EPF Employee and Employer percentages for specific individuals.
+    - **Deferred Impact Logic**: Mid-month compensation updates automatically apply only to the next month's payroll.
+    - Detailed payroll records and payslip generation.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Employee Profiles**:
+    - Centralized repository for personal, professional, and banking information.
+    - Document management (Offer Letters, Identity Proofs, etc.).
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React (Vite), TypeScript, Tailwind CSS.
+- **Backend/Database**: Supabase (PostgreSQL, Auth, Storage).
+- **Icons**: Lucide React.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. Clone the repository.
+2. Install dependencies: `npm install`.
+3. Set up environment variables in `.env`.
+4. Run development server: `npm run dev`.
