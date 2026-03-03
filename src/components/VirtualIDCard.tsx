@@ -19,7 +19,6 @@ const VirtualIDCard: React.FC<VirtualIDCardProps> = ({ employee, onClose }) => {
                     {/* Top Branding */}
                     <header className="id-header">
                         <img src="/id_assets/idcard_logo.png" alt="Versovate" className="id-brand-logo" />
-                        <span className="id-brand-name">Versovate</span>
                     </header>
 
                     {/* Employee Identity Text */}
@@ -106,7 +105,7 @@ const VirtualIDCard: React.FC<VirtualIDCardProps> = ({ employee, onClose }) => {
                 }
 
                 .id-brand-logo {
-                    height: 24px;
+                    height: 44px; /* Increased from 24px */
                     filter: brightness(0) invert(1);
                 }
 
