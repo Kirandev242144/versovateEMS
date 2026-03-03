@@ -26,6 +26,7 @@ const MyProfile: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'personal' | 'professional' | 'bank'>('personal');
     const [showIDCard, setShowIDCard] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [idUploading, setIdUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
@@ -94,6 +95,43 @@ const MyProfile: React.FC = () => {
         }
     };
 
+    const handleIdPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !profile?.id) return;
+
+        setIdUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${profile.id}-idphoto-${Date.now()}.${fileExt}`;
+            const filePath = `id-photos/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('employee-docs')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('employee-docs')
+                .getPublicUrl(filePath);
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ id_photo_url: publicUrl })
+                .eq('id', profile.id);
+
+            if (updateError) throw updateError;
+
+            setProfile({ ...profile, id_photo_url: publicUrl });
+            setEditForm({ ...editForm, id_photo_url: publicUrl });
+            alert("ID Card Photo Updated!");
+        } catch (err: any) {
+            alert("ID Photo Upload failed: " + err.message);
+        } finally {
+            setIdUploading(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!profile?.id) return;
         setIsSaving(true);
@@ -137,7 +175,7 @@ const MyProfile: React.FC = () => {
                                 {profile?.full_name?.split(' ').map((n: string) => n[0]).join('')}
                             </div>
                         )}
-                        <label className="photo-upload-badge">
+                        <label className="photo-upload-badge" title="Update Profile Picture">
                             <input type="file" hidden accept="image/*" onChange={handlePhotoUpload} />
                             {uploading ? <Loader2 className="animate-spin" size={16} /> : <Camera size={16} />}
                         </label>
@@ -158,13 +196,20 @@ const MyProfile: React.FC = () => {
                     </div>
                 </div>
                 <div className="hero-actions">
-                    <button className="id-card-trigger" onClick={() => setShowIDCard(true)}>
-                        <div className="trigger-icon"><Globe size={20} /></div>
-                        <div className="trigger-text">
-                            <span>Digital ID</span>
-                            <small>Preview Card</small>
-                        </div>
-                    </button>
+                    <div className="id-card-actions">
+                        <label className="id-photo-upload-btn">
+                            <input type="file" hidden accept="image/png" onChange={handleIdPhotoUpload} />
+                            {idUploading ? <Loader2 className="animate-spin" size={18} /> : <Camera size={18} />}
+                            <span>{profile?.id_photo_url ? 'Change ID Photo' : 'Upload ID Photo'}</span>
+                        </label>
+                        <button className="id-card-trigger" onClick={() => setShowIDCard(true)}>
+                            <div className="trigger-icon"><Globe size={20} /></div>
+                            <div className="trigger-text">
+                                <span>Digital ID</span>
+                                <small>Preview Card</small>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -268,6 +313,33 @@ const MyProfile: React.FC = () => {
                     display: flex;
                     gap: 32px;
                     align-items: center;
+                }
+
+                .id-card-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                }
+
+                .id-photo-upload-btn {
+                    padding: 12px 20px;
+                    background: rgba(var(--color-primary-rgb), 0.1);
+                    color: var(--color-primary);
+                    border: 1.5px dashed var(--color-primary);
+                    border-radius: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 13px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .id-photo-upload-btn:hover {
+                    background: var(--color-primary);
+                    color: white;
+                    border-style: solid;
                 }
 
                 .profile-avatar-wrapper {

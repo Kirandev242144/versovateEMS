@@ -33,6 +33,7 @@ export interface EmployeeProfile {
     id_proof_url?: string;
     aadhaar_pan_url?: string;
     profile_pic_url?: string;
+    id_photo_url?: string;
     custom_id?: string;
     personal_email?: string;
     aadhar_number?: string;

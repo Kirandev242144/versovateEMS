@@ -6,6 +6,7 @@ interface VirtualIDCardProps {
         full_name: string;
         job_title: string;
         profile_pic_url?: string;
+        id_photo_url?: string;
         id: string;
     };
     onClose?: () => void;
@@ -37,8 +38,8 @@ const VirtualIDCard: React.FC<VirtualIDCardProps> = ({ employee, onClose }) => {
 
                         {/* Transparent Photo Overlay */}
                         <div className="id-photo-area">
-                            {employee.profile_pic_url ? (
-                                <img src={employee.profile_pic_url} alt={employee.full_name} className="id-main-photo" />
+                            {(employee.id_photo_url || employee.profile_pic_url) ? (
+                                <img src={employee.id_photo_url || employee.profile_pic_url} alt={employee.full_name} className="id-main-photo" />
                             ) : (
                                 <div className="id-photo-placeholder">
                                     <User size={80} strokeWidth={1} />
