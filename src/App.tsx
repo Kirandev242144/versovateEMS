@@ -25,7 +25,7 @@ import Billing from './pages/Billing.tsx';
 import EmployeePayslips from './pages/EmployeePayslips.tsx';
 import EmployeeLeaves from './pages/EmployeeLeaves.tsx';
 import AdminLeaves from './pages/AdminLeaves.tsx';
-import { ProfilePage } from './pages/PlaceholderPages.tsx';
+import MyProfile from './pages/MyProfile.tsx';
 
 // Admin Layout Wrapper
 const AdminLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
@@ -177,7 +177,7 @@ function App() {
           <Route path="attendance" element={<EmployeeAttendance />} />
           <Route path="payslips" element={<EmployeePayslips />} />
           <Route path="leaves" element={<EmployeeLeaves />} />
-          <Route path="profile" element={<ProfilePage />} />
+          <Route path="profile" element={<MyProfile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
 
