@@ -274,16 +274,26 @@ const EmployeeAttendance: React.FC = () => {
                     </div>
 
                     <form className="timesheet-form" onSubmit={handleActionSubmit}>
-                        {new Date().getDay() === 5 && !isAlreadySubmitted && (
-                            <div className="friday-reminder-banner mb-20">
+                        {new Date().getDay() === 5 ? (
+                            !isAlreadySubmitted && (
+                                <div className="friday-reminder-banner mb-20">
+                                    <AlertCircle size={20} />
+                                    <div className="fr-content">
+                                        <strong>It's Friday!</strong>
+                                        <p>Please remember to review and submit your weekly timesheet before you head out.</p>
+                                    </div>
+                                    <button type="button" onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className="fr-btn">
+                                        Submit Now
+                                    </button>
+                                </div>
+                            )
+                        ) : (
+                            <div className="friday-reminder-banner mb-20 warning" style={{ background: 'rgba(255, 159, 28, 0.1)', borderColor: '#FF9F1C', color: '#FF9F1C' }}>
                                 <AlertCircle size={20} />
                                 <div className="fr-content">
-                                    <strong>It's Friday!</strong>
-                                    <p>Please remember to review and submit your weekly timesheet before you head out.</p>
+                                    <strong>Submission Locked</strong>
+                                    <p>Attendance can only be submitted on Fridays. Please come back on Friday to submit this week's records.</p>
                                 </div>
-                                <button type="button" onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className="fr-btn">
-                                    Submit Now
-                                </button>
                             </div>
                         )}
                         <div className="calendar-ui mb-30">
@@ -351,12 +361,12 @@ const EmployeeAttendance: React.FC = () => {
 
                         <button
                             type="submit"
-                            className={`btn-submit ${isAlreadySubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={submitting || isAlreadySubmitted}
-                            title={isAlreadySubmitted ? "Timesheet already submitted for this exact week" : ""}
+                            className={`btn-submit ${(isAlreadySubmitted || new Date().getDay() !== 5) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={submitting || isAlreadySubmitted || new Date().getDay() !== 5}
+                            title={isAlreadySubmitted ? "Timesheet already submitted for this exact week" : new Date().getDay() !== 5 ? "Submissions only allowed on Fridays" : ""}
                         >
                             {submitting ? <RefreshCw className="spin" size={20} /> : <Save size={20} />}
-                            <span>{submitting ? 'Submitting...' : isAlreadySubmitted ? 'Already Submitted' : 'Submit Week to Admin'}</span>
+                            <span>{submitting ? 'Submitting...' : isAlreadySubmitted ? 'Already Submitted' : new Date().getDay() !== 5 ? 'Submission Locked (Friday Only)' : 'Submit Week to Admin'}</span>
                         </button>
                     </form>
                 </div>

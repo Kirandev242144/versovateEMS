@@ -1,22 +1,38 @@
 import StatCard from '../components/StatCard';
 import AttendanceChart from '../components/AttendanceChart';
 import CalendarWidget from '../components/CalendarWidget';
-import { Users, Clock, Calendar, UserCheck, Loader2 } from 'lucide-react';
+import { Users, UserCheck, Loader2, IndianRupee, FileText } from 'lucide-react';
 import { useEmployees } from '../hooks/useEmployees';
+import { useAdminDashboardStats } from '../hooks/useAdminDashboardStats';
 import DataError from '../components/DataError';
 
 const Dashboard = () => {
-  const { stats, initialLoadDone, error, refresh } = useEmployees();
+  const { stats: employeeStats, initialLoadDone: empLoadDone, error: empError, refresh: refreshEmp } = useEmployees();
+  const {
+    invoicedAmount,
+    revenueAmount,
+    newEmployees,
+    attendanceRate,
+    attendanceData,
+    loading: statsLoading,
+    error: statsError,
+    refresh: refreshStats
+  } = useAdminDashboardStats();
 
-  if (error && !initialLoadDone) {
+  const handleRefresh = () => {
+    refreshEmp();
+    refreshStats();
+  };
+
+  if ((empError || statsError) && !empLoadDone) {
     return (
       <div className="content-area centered">
-        <DataError message={error} onRetry={refresh} />
+        <DataError message={empError || statsError || 'Error loading dashboard'} onRetry={handleRefresh} />
       </div>
     );
   }
 
-  if (!initialLoadDone) {
+  if (!empLoadDone || statsLoading) {
     return (
       <div className="content-area centered">
         <Loader2 className="animate-spin" size={48} color="var(--color-primary)" />
@@ -30,32 +46,31 @@ const Dashboard = () => {
       <div className="stats-grid">
         <StatCard
           title="Total Employees"
-          value={stats.total.toString()}
-          subtitle="You're part of a growing team!"
+          value={employeeStats.total.toString()}
+          subtitle="Overall workforce strength"
           icon={Users}
           variant="default"
         />
         <StatCard
-          title="Attendance"
-          value="92%"
-          subtitle="3 Days Off, 1 Late Arrival"
-          trend="+1.54%"
-          icon={Clock}
+          title="Weekly Revenue"
+          value={`₹${revenueAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          subtitle="Payments collected this week"
+          icon={IndianRupee}
           variant="teal"
         />
         <StatCard
-          title="Leave Requests"
-          value="1"
-          subtitle="1 Approved, 1 Pending Review"
-          icon={Calendar}
-          variant="default"
+          title="Weekly Invoiced"
+          value={`₹${invoicedAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          subtitle="Invoices generated this week"
+          icon={FileText}
+          variant="primary"
         />
         <StatCard
-          title="Job Applicants"
-          value="+12%"
-          subtitle="37 new applicants"
+          title="New Onboardings"
+          value={`+${newEmployees}`}
+          subtitle="Employees joined this week"
           icon={UserCheck}
-          variant="primary"
+          variant="default"
         />
       </div>
 
@@ -65,19 +80,19 @@ const Dashboard = () => {
             <div className="card-header">
               <div className="title-group">
                 <h3>Attendance Report</h3>
-                <p className="subtitle">Attendance Rate</p>
+                <p className="subtitle">Average Weekly Rate</p>
               </div>
               <div className="header-meta">
-                <span className="badge">This Month</span>
+                <span className="badge">This Week</span>
               </div>
             </div>
             <div className="attendance-summary">
               <div className="summary-item">
-                <span className="sum-value">92%</span>
-                <span className="trend-badge lime">+1.54%</span>
+                <span className="sum-value">{attendanceRate}%</span>
+                <span className="trend-badge lime">Live</span>
               </div>
             </div>
-            <AttendanceChart />
+            <AttendanceChart data={attendanceData} />
           </div>
         </div>
 
@@ -94,16 +109,16 @@ const Dashboard = () => {
               <div className="status-item">
                 <div className="status-info">
                   <span>Full-Time</span>
-                  <span>68% - 87 Employees</span>
+                  <span>{Math.round((employeeStats.active / employeeStats.total) * 100) || 0}% - {employeeStats.active} Employees</span>
                 </div>
-                <div className="progress-bg"><div className="progress-fill" style={{ width: '68%', background: 'var(--color-teal)' }}></div></div>
+                <div className="progress-bg"><div className="progress-fill" style={{ width: `${(employeeStats.active / employeeStats.total) * 100}%`, background: 'var(--color-teal)' }}></div></div>
               </div>
               <div className="status-item">
                 <div className="status-info">
-                  <span>Part-Time</span>
-                  <span>15% - 19 Employees</span>
+                  <span>On Leave</span>
+                  <span>{Math.round((employeeStats.onLeave / employeeStats.total) * 100) || 0}% - {employeeStats.onLeave} Employees</span>
                 </div>
-                <div className="progress-bg"><div className="progress-fill" style={{ width: '15%', background: 'var(--color-primary)' }}></div></div>
+                <div className="progress-bg"><div className="progress-fill" style={{ width: `${(employeeStats.onLeave / employeeStats.total) * 100}%`, background: 'var(--color-primary)' }}></div></div>
               </div>
             </div>
           </div>

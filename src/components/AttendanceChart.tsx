@@ -9,15 +9,19 @@ import {
     Cell
 } from 'recharts';
 
-const data = [
-    { day: 'Mon', attendance: 95 },
-    { day: 'Tue', attendance: 88 },
-    { day: 'Wed', attendance: 92 },
-    { day: 'Thu', attendance: 98 },
-    { day: 'Fri', attendance: 90 },
+interface AttendanceChartProps {
+    data?: { day: string; attendance: number }[];
+}
+
+const defaultData = [
+    { day: 'Mon', attendance: 0 },
+    { day: 'Tue', attendance: 0 },
+    { day: 'Wed', attendance: 0 },
+    { day: 'Thu', attendance: 0 },
+    { day: 'Fri', attendance: 0 },
 ];
 
-const AttendanceChart = () => {
+const AttendanceChart = ({ data = defaultData }: AttendanceChartProps) => {
     return (
         <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
@@ -34,6 +38,7 @@ const AttendanceChart = () => {
                         axisLine={false}
                         tickLine={false}
                         tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
+                        domain={[0, 100]}
                     />
                     <Tooltip
                         cursor={{ fill: 'var(--bg-muted)' }}
@@ -44,12 +49,13 @@ const AttendanceChart = () => {
                             boxShadow: 'var(--shadow-md)',
                             color: 'var(--text-primary)'
                         }}
+                        formatter={(value: any) => [`${value}%`, 'Attendance']}
                     />
                     <Bar dataKey="attendance" radius={[6, 6, 0, 0]}>
                         {data.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
-                                fill={entry.attendance > 93 ? '#00BFA5' : 'rgba(0, 191, 165, 0.2)'}
+                                fill={entry.attendance > 90 ? '#00BFA5' : entry.attendance > 0 ? 'rgba(0, 191, 165, 0.4)' : 'var(--bg-muted)'}
                             />
                         ))}
                     </Bar>
