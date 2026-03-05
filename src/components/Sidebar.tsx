@@ -69,7 +69,7 @@ const employeeNavItems: NavItem[] = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isDarkMode }) => {
   const [userId, setUserId] = useState<string | undefined>();
-  const { role } = useRole(userId);
+  const { role, permissions } = useRole(userId);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,7 +81,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isDarkMode }) => {
     await supabase.auth.signOut();
   };
 
-  const navItems = role === 'admin' ? adminNavItems : employeeNavItems;
+  const navItems = React.useMemo(() => {
+    // Treat any custom role as an 'Admin' portal user (Operation Manager, etc.)
+    // Only the default 'employee' role uses the Employee portal
+    const baseItems = role === 'employee' ? employeeNavItems : adminNavItems;
+
+    if (permissions?.all) return baseItems;
+    if (!permissions) return [];
+
+    return baseItems.filter(item => {
+      const pathKey = item.path.split('/').filter(Boolean).pop()?.toLowerCase() || 'dashboard';
+      // Mappings for specific paths to permission keys
+      const mapping: Record<string, string> = {
+        'admin': 'dashboard',
+        'payslips': 'payroll'
+      };
+      const keyToCheck = mapping[pathKey] || pathKey;
+      return !!permissions[keyToCheck];
+    });
+  }, [role, permissions]);
 
   return (
     <aside className="sidebar">

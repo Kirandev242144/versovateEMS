@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme }) => {
-  const [userProfile, setUserProfile] = useState<{ full_name: string; role: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ full_name: string; role: string; email: string } | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme }) => {
       if (session?.user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, role')
+          .select('full_name, role, email')
           .eq('id', session.user.id)
           .maybeSingle();
         if (data) setUserProfile(data);
@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme }) => {
       if (session?.user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, role')
+          .select('full_name, role, email')
           .eq('id', session.user.id)
           .maybeSingle();
         if (data) setUserProfile(data);
@@ -47,6 +47,9 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme }) => {
   const getInitials = (name: string) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
   };
+
+  const isMainAdmin = userProfile?.email === 'admin@versovate.com';
+  const displayName = isMainAdmin ? 'System Administrator' : (userProfile?.full_name || 'Loading...');
 
   return (
     <header className="header glass">
@@ -78,8 +81,8 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleTheme }) => {
 
         <div className="user-profile">
           <div className="user-info">
-            <p className="user-name">{userProfile?.full_name || 'Loading...'}</p>
-            <p className="user-role" style={{ textTransform: 'capitalize' }}>{userProfile?.role || 'User'}</p>
+            <p className="user-name">{displayName}</p>
+            <p className="user-role" style={{ textTransform: 'capitalize' }}>{isMainAdmin ? 'Admin' : (userProfile?.role || 'User')}</p>
           </div>
           <div className="user-avatar" style={{ overflow: 'hidden' }}>
             {userProfile?.full_name ? getInitials(userProfile.full_name) : <User size={24} />}

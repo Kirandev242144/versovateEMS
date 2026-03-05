@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, session, requiredRole }) => {
-    const { role, isOnboarded, loading } = useRole(session?.user?.id);
+    const { role, permissions, isOnboarded, loading } = useRole(session?.user?.id);
     const location = useLocation();
 
     if (!session) {
@@ -37,18 +37,40 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, session, requ
         );
     }
 
-    // Role check
-    if (requiredRole && role !== requiredRole) {
-        console.log(`[Auth] Role mismatch: have ${role}, need ${requiredRole}. Path: ${location.pathname}`);
+    // Role & Permission check
+    const isAdminPath = location.pathname.startsWith('/Admin');
+    const isCustomAdmin = role !== 'employee' && role !== null;
+    const pathKey = location.pathname.split('/').filter(Boolean).pop()?.toLowerCase() || (isAdminPath ? 'dashboard' : 'dashboard');
 
-        if (!role) {
-            if (location.pathname === '/onboarding') return <>{children}</>;
-            if (location.pathname.startsWith('/Admin')) return <Navigate to="/admin-login" replace />;
-            return <Navigate to="/onboarding" replace />;
-        }
+    const hasPermission = () => {
+        if (!permissions) return false;
+        if (permissions.all) return true;
 
-        const target = role === 'admin' ? "/Admin" : "/";
-        return <Navigate to={target} replace />;
+        // Map common paths to standard permission keys
+        const permKey = pathKey === 'admin' ? 'dashboard' : pathKey;
+        const mapping: Record<string, string> = { 'payslips': 'payroll' };
+        const keyToCheck = mapping[permKey] || permKey;
+
+        return !!permissions[keyToCheck];
+    };
+
+    // Enforce portal boundaries
+    if (requiredRole === 'admin' && role === 'employee') {
+        return <Navigate to="/" replace />;
+    }
+
+    if (requiredRole === 'employee' && isCustomAdmin) {
+        return <Navigate to="/Admin" replace />;
+    }
+
+    // specific handling for landing on root paths
+    if (location.pathname === '/' && isCustomAdmin) return <Navigate to="/Admin" replace />;
+    if (location.pathname === '/Admin' && role === 'employee') return <Navigate to="/" replace />;
+
+    // Specific permission check for admin routes
+    if (isAdminPath && !hasPermission() && location.pathname !== '/Admin' && location.pathname !== '/Admin/') {
+        console.log(`[Auth] No permission for ${location.pathname}. Keys checked: ${pathKey}`);
+        return <Navigate to="/Admin" replace />;
     }
 
     // Onboarding check for employees

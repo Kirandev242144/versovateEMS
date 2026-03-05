@@ -46,8 +46,8 @@ const AdminLogin: React.FC<LoginProps> = ({ isDarkMode }) => {
       });
       if (error) throw error;
 
-      if (user) {
-        // Ensure admin profile exists in the profiles table
+      if (user && user.email === 'admin@versovate.com') {
+        // Ensure main admin profile stays admin
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
@@ -59,7 +59,6 @@ const AdminLogin: React.FC<LoginProps> = ({ isDarkMode }) => {
 
         if (profileError) {
           console.error("Failed to ensure admin profile:", profileError);
-          // We still navigate, ProtectedRoute will catch it if it's fatal
         }
       }
 

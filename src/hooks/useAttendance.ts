@@ -61,6 +61,7 @@ export const useAttendance = () => {
                 return;
             }
 
+
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('role, work_days')
@@ -188,6 +189,7 @@ export const useAttendance = () => {
         if (error) throw error;
         // The realtime subscription will auto-fetch the list
     };
+
 
     return {
         records,

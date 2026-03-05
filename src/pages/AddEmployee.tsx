@@ -55,24 +55,37 @@ const AddEmployee = ({ onBack }: { onBack: () => void }) => {
         bankPan: '',
         bankBranch: '',
         // Auth
-        password: 'Welcome@123',
+        role_id: '',
         allowances: ['Transportation', 'Meal'],
         insurance: ['Health Insurance']
     });
 
     const [departments, setDepartments] = useState<any[]>([]);
+    const [roles, setRoles] = useState<any[]>([]);
 
     React.useEffect(() => {
-        const fetchDeps = async () => {
-            const { data } = await supabase.from('departments').select('*').order('name');
-            if (data) {
-                setDepartments(data);
-                if (data.length > 0) {
-                    setFormData(prev => ({ ...prev, department: data[0].name }));
+        const fetchData = async () => {
+            const [depsRes, rolesRes] = await Promise.all([
+                supabase.from('departments').select('*').order('name'),
+                supabase.from('roles').select('id, name').order('name')
+            ]);
+
+            if (depsRes.data) {
+                setDepartments(depsRes.data);
+                if (depsRes.data.length > 0) {
+                    setFormData(prev => ({ ...prev, department: depsRes.data[0].name }));
+                }
+            }
+
+            if (rolesRes.data) {
+                setRoles(rolesRes.data);
+                const employeeRole = rolesRes.data.find(r => r.name === 'employee');
+                if (employeeRole) {
+                    setFormData(prev => ({ ...prev, role_id: employeeRole.id }));
                 }
             }
         };
-        fetchDeps();
+        fetchData();
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -97,11 +110,11 @@ const AddEmployee = ({ onBack }: { onBack: () => void }) => {
             // 2. Register the user in Supabase Auth
             const { data: authData, error: authError } = await tempClient.auth.signUp({
                 email: formData.email,
-                password: formData.password,
+                password: 'Welcome@123',
                 options: {
                     data: {
                         full_name: formData.fullName,
-                        role: 'employee'
+                        role: roles.find(r => r.id === formData.role_id)?.name || 'employee'
                     }
                 }
             });
@@ -148,7 +161,9 @@ const AddEmployee = ({ onBack }: { onBack: () => void }) => {
                     bank_account_number: formData.bankAccountNumber,
                     bank_ifsc: formData.bankIfsc,
                     bank_pan: formData.bankPan,
-                    bank_branch: formData.bankBranch
+                    bank_branch: formData.bankBranch,
+                    role: roles.find(r => r.id === formData.role_id)?.name || 'employee',
+                    role_id: formData.role_id
                 })
                 .eq('id', authData.user.id);
 
@@ -368,6 +383,15 @@ const AddEmployee = ({ onBack }: { onBack: () => void }) => {
                                             <div className="form-group">
                                                 <label>Other Allowances</label>
                                                 <input type="number" name="salaryOtherAllowance" value={formData.salaryOtherAllowance} onChange={handleInputChange} />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>User Role</label>
+                                                <select name="role_id" value={formData.role_id} onChange={handleInputChange}>
+                                                    {roles.map(r => (
+                                                        <option key={r.id} value={r.id}>{r.name.charAt(0).toUpperCase() + r.name.slice(1)}</option>
+                                                    ))}
+                                                </select>
+                                                <p className="field-hint" style={{ fontSize: '11px', marginTop: '4px' }}>Controls what pages this user can see in their portal.</p>
                                             </div>
                                             <div className="form-group">
                                                 <label>Total Monthly CTC</label>
