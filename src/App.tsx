@@ -27,6 +27,7 @@ import EmployeeLeaves from './pages/EmployeeLeaves.tsx';
 import AdminLeaves from './pages/AdminLeaves.tsx';
 import MyProfile from './pages/MyProfile.tsx';
 import Settings from './pages/Settings.tsx';
+import Inbox from './pages/Inbox.tsx';
 
 // Admin Layout Wrapper
 const AdminLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
@@ -60,6 +61,7 @@ const AdminRoutes = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleT
         <Route path="leaves" element={<AdminLeaves />} />
         <Route path="settings" element={<Settings />} />
         <Route path="add-employee" element={<AddEmployee onBack={() => navigate('/Admin/employees')} />} />
+        <Route path="inbox" element={<Inbox />} />
         <Route path="*" element={<Navigate to="/Admin" replace />} />
       </Route>
     </Routes>

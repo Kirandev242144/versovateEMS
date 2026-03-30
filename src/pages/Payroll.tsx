@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import StatCardINR from '../components/StatCardINR.tsx';
 import { usePayroll, type PayrollRecord } from '../hooks/usePayroll';
+import { useAttendance } from '../hooks/useAttendance';
+import AttendanceHistoryModal from '../components/AttendanceHistoryModal';
 import {
     IndianRupee,
     CreditCard,
@@ -13,7 +15,8 @@ import {
     Printer,
     AlertTriangle,
     RefreshCw,
-    CheckCircle2
+    CheckCircle2,
+    Calendar
 } from 'lucide-react';
 import PayslipTemplate, { buildPayslipData } from '../components/PayslipTemplate';
 import DataError from '../components/DataError';
@@ -41,10 +44,12 @@ const Payroll: React.FC = () => {
     }, []);
 
     const { records, loading, error, generating, generatePayroll, markAsPaid, fetchRecords } = usePayroll(selectedMonthYear);
+    const { records: attendanceRecords } = useAttendance();
 
     const [showPayslip, setShowPayslip] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<PayrollRecord | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [historyEmployee, setHistoryEmployee] = useState<any | null>(null);
 
     const handlePreview = (record: PayrollRecord) => {
         setSelectedRecord(record);
@@ -70,6 +75,15 @@ const Payroll: React.FC = () => {
         );
     }, [records, searchQuery]);
 
+    // Calculate cycle range for display
+    const cycleRange = useMemo(() => {
+        const [y, m] = selectedMonthYear.split('-').map(Number);
+        const start = new Date(y, m - 2, 10);
+        const end = new Date(y, m - 1, 9);
+        const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        return `${fmt(start)} — ${fmt(end)}`;
+    }, [selectedMonthYear]);
+
     // Calculate dynamic stats
     const stats = useMemo(() => {
         let netPayout = 0;
@@ -87,7 +101,7 @@ const Payroll: React.FC = () => {
             <div className="system-alert-banner">
                 <AlertTriangle size={18} className="sab-icon" />
                 <div className="sab-text">
-                    <strong>Payroll Cutoff Reminder:</strong> Attendance editing locks at 11:59 PM on the 9th of every month. Payroll dispersal occurs on the 10th. Generate payroll only after attendance is finalized.
+                    <strong>Payroll Cutoff Reminder:</strong> Attendance editing locks at 11:59 PM on the 9th of every month. Payroll dispersal occurs on the 10th. Current Cycle: <code style={{ background: 'rgba(0,0,0,0.1)', padding: '2px 6px', borderRadius: '4px' }}>{cycleRange}</code>
                 </div>
             </div>
 
@@ -97,14 +111,17 @@ const Payroll: React.FC = () => {
                     <p className="subtitle-muted">Manage monthly salary processing and attendance deductions natively.</p>
                 </div>
                 <div className="month-picker-container">
-                    <span className="picker-label">Payroll Cycle:</span>
-                    <select
-                        className="month-dropdown"
-                        value={selectedMonthYear}
-                        onChange={(e) => setSelectedMonthYear(e.target.value)}
-                    >
-                        {availableMonths.map(m => <option key={m.val} value={m.val}>{m.label}</option>)}
-                    </select>
+                    <div style={{ textAlign: 'right' }}>
+                        <span className="picker-label">Payroll Cycle:</span>
+                        <select
+                            className="month-dropdown"
+                            value={selectedMonthYear}
+                            onChange={(e) => setSelectedMonthYear(e.target.value)}
+                        >
+                            {availableMonths.map(m => <option key={m.val} value={m.val}>{m.label}</option>)}
+                        </select>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 600 }}>({cycleRange})</p>
+                    </div>
                 </div>
             </div>
 
@@ -147,28 +164,34 @@ const Payroll: React.FC = () => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="filter-actions">
-                        <button className="btn-filter-icon" onClick={() => fetchRecords(selectedMonthYear)} title="Refresh Data">
+                    <div className="filter-actions" style={{ gap: '10px' }}>
+                        <button className="btn-filter-icon" onClick={() => fetchRecords(selectedMonthYear)} title="Refresh List">
                             <RefreshCw size={18} />
                         </button>
                         <div className="v-divider"></div>
 
-                        {records.length > 0 ? (
-                            <button
-                                className="btn-generate bg-success"
-                                onClick={handleMarkAllPaid}
-                            >
-                                <CheckCircle2 size={16} /> Mark Run Complete
-                            </button>
-                        ) : (
+                        {records.length > 0 && (
                             <button
                                 className="btn-generate"
+                                style={{ background: 'var(--bg-block)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
                                 onClick={handleGenerate}
                                 disabled={generating}
                             >
-                                {generating ? 'Generating Data...' : `Generate Payroll for ${availableMonths.find(m => m.val === selectedMonthYear)?.label}`}
+                                <RefreshCw size={14} className={generating ? 'animate-spin' : ''} /> {generating ? 'Processing...' : 'Re-calculate Payroll'}
                             </button>
                         )}
+
+                        <button
+                            className={`btn-generate ${records.length > 0 ? 'bg-success' : ''}`}
+                            onClick={records.length > 0 ? handleMarkAllPaid : handleGenerate}
+                            disabled={generating}
+                        >
+                            {records.length > 0 ? (
+                                <><CheckCircle2 size={16} /> Mark Run Complete</>
+                            ) : (
+                                <>{generating ? 'Generating...' : `Generate Payroll for ${availableMonths.find(m => m.val === selectedMonthYear)?.label}`}</>
+                            )}
+                        </button>
                     </div>
                 </div>
 
@@ -231,6 +254,18 @@ const Payroll: React.FC = () => {
                                     </td>
                                     <td className="text-right">
                                         <div className="row-actions">
+                                            <button
+                                                className="row-icon-btn"
+                                                title="View Attendance Calendar"
+                                                onClick={() => setHistoryEmployee({
+                                                    id: r.employee_id,
+                                                    name: r.profile?.full_name || 'Unknown',
+                                                    custom_id: r.profile?.custom_id || r.employee_id.substring(0, 8),
+                                                    pic: r.profile?.profile_pic_url
+                                                })}
+                                            >
+                                                <Calendar size={16} />
+                                            </button>
                                             {r.status !== 'Paid' && (
                                                 <button className="row-btn-primary mini" onClick={() => markAsPaid(r.id)}>Mark Paid</button>
                                             )}
@@ -248,6 +283,15 @@ const Payroll: React.FC = () => {
                     </table>
                 </div>
             </div>
+
+            {historyEmployee && (
+                <AttendanceHistoryModal
+                    employee={historyEmployee}
+                    records={attendanceRecords}
+                    onClose={() => setHistoryEmployee(null)}
+                    initialMonthYear={selectedMonthYear}
+                />
+            )}
 
             {showPayslip && selectedRecord && (
                 <div className="payslip-modal" onClick={() => setShowPayslip(false)}>
