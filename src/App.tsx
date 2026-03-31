@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -29,15 +29,17 @@ import MyProfile from './pages/MyProfile.tsx';
 import Settings from './pages/Settings.tsx';
 import Inbox from './pages/Inbox.tsx';
 import Recruitments from './pages/Recruitments.tsx';
+import Calendar from './pages/Calendar.tsx';
 
 // Admin Layout Wrapper
 const AdminLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
+  const location = useLocation();
   return (
     <div className="app-container">
       <Sidebar isDarkMode={isDarkMode} />
       <main className="main-content">
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-        <div className="content-area">
+        <div className={`content-area ${location.pathname.includes('/calendar') ? 'no-padding' : ''}`}>
           <Outlet />
         </div>
       </main>
@@ -64,6 +66,7 @@ const AdminRoutes = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleT
         <Route path="add-employee" element={<AddEmployee onBack={() => navigate('/Admin/employees')} />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="recruitments" element={<Recruitments />} />
+        <Route path="calendar" element={<Calendar />} />
         <Route path="*" element={<Navigate to="/Admin" replace />} />
       </Route>
     </Routes>
@@ -72,12 +75,13 @@ const AdminRoutes = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleT
 
 // Employee Layout Wrapper
 const EmployeeLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
+  const location = useLocation();
   return (
     <div className="app-container employee-portal">
       <Sidebar isDarkMode={isDarkMode} />
       <main className="main-content">
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-        <div className="content-area">
+        <div className={`content-area ${location.pathname.includes('/calendar') ? 'no-padding' : ''}`}>
           <Outlet />
         </div>
       </main>
@@ -209,6 +213,9 @@ function App() {
         }
         .content-area {
           padding: 24px;
+        }
+        .content-area.no-padding {
+          padding: 0;
         }
         .content-area.centered {
           display: flex;
