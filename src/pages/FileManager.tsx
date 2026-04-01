@@ -41,6 +41,10 @@ const FileManager: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showNewFolderModal, setShowNewFolderModal] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
+    const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [draggingFile, setDraggingFile] = useState<FileItem | null>(null);
+    const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
     const fetchFiles = useCallback(async () => {
         setLoading(true);
@@ -140,6 +144,29 @@ const FileManager: React.FC = () => {
         }
     };
 
+    const handleFileClick = async (file: FileItem) => {
+        if (file.is_folder) {
+            setCurrentFolder(file.id);
+            setBreadcrumbs([...breadcrumbs, { id: file.id, name: file.name }]);
+        } else {
+            setLoading(true);
+            try {
+                const { data } = supabase.storage
+                    .from('file-manager')
+                    .getPublicUrl(file.storage_path);
+
+                if (data.publicUrl) {
+                    setPreviewUrl(data.publicUrl);
+                    setPreviewFile(file);
+                }
+            } catch (err) {
+                console.error("Preview error:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     const deleteItem = async (item: FileItem) => {
         if (!confirm(`Are you sure you want to delete "${item.name}"?`)) return;
 
@@ -182,53 +209,43 @@ const FileManager: React.FC = () => {
         }
     };
 
-    const navigateToFolder = (folder: FileItem) => {
-        setCurrentFolder(folder.id);
-        setBreadcrumbs([...breadcrumbs, { id: folder.id, name: folder.name }]);
-    };
-
     const navigateBack = (index: number) => {
         const newBreadcrumbs = breadcrumbs.slice(0, index + 1);
         setBreadcrumbs(newBreadcrumbs);
         setCurrentFolder(newBreadcrumbs[newBreadcrumbs.length - 1].id);
     };
 
-    const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
-
-    const handleDragStart = (e: React.DragEvent, item: FileItem) => {
-        if (item.is_folder) return;
-        e.dataTransfer.setData('fileId', item.id);
-        e.dataTransfer.effectAllowed = 'move';
+    const handleDragStart = (file: FileItem) => {
+        setDraggingFile(file);
     };
 
     const handleDragOver = (e: React.DragEvent, item: FileItem) => {
         if (!item.is_folder) return;
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        setDragOverFolder(item.id);
+        setDragOverFolderId(item.id);
     };
 
     const handleDragLeave = () => {
-        setDragOverFolder(null);
+        setDragOverFolderId(null);
     };
 
     const handleDrop = async (e: React.DragEvent, targetFolder: FileItem) => {
         e.preventDefault();
-        setDragOverFolder(null);
-
-        const fileId = e.dataTransfer.getData('fileId');
-        if (!fileId || !targetFolder.is_folder || fileId === targetFolder.id) return;
+        setDragOverFolderId(null);
+        if (!draggingFile || !targetFolder.is_folder || draggingFile.id === targetFolder.id) return;
 
         try {
             const { error } = await supabase
                 .from('file_manager_files')
                 .update({ parent_id: targetFolder.id })
-                .eq('id', fileId);
+                .eq('id', draggingFile.id);
 
             if (error) throw error;
             fetchFiles();
         } catch (error: any) {
             alert('Failed to move file: ' + error.message);
+        } finally {
+            setDraggingFile(null);
         }
     };
 
@@ -320,14 +337,14 @@ const FileManager: React.FC = () => {
                         {filteredFiles.map(file => (
                             <div
                                 key={file.id}
-                                className={`fm-item grid glass ${dragOverFolder === file.id ? 'drag-over' : ''}`}
-                                draggable={!file.is_folder}
-                                onDragStart={(e) => handleDragStart(e, file)}
-                                onDragOver={(e) => file.is_folder && handleDragOver(e, file)}
-                                onDragLeave={() => file.is_folder && handleDragLeave()}
-                                onDrop={(e) => file.is_folder && handleDrop(e, file)}
-                                onDoubleClick={() => file.is_folder && navigateToFolder(file)}
-                                onClick={() => file.is_folder && navigateToFolder(file)}
+                                className={`fm-item grid glass ${draggingFile?.id === file.id ? 'dragging' : ''} ${dragOverFolderId === file.id ? 'drag-over' : ''}`}
+                                onClick={() => handleFileClick(file)}
+                                draggable
+                                onDragStart={() => handleDragStart(file)}
+                                onDragEnd={() => setDraggingFile(null)}
+                                onDragOver={(e) => handleDragOver(e, file)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => handleDrop(e, file)}
                             >
                                 <div className="fm-item-icon">
                                     {getFileIcon(file.mime_type, file.is_folder)}
@@ -360,14 +377,14 @@ const FileManager: React.FC = () => {
                             {filteredFiles.map(file => (
                                 <tr
                                     key={file.id}
-                                    className={`fm-item-row ${dragOverFolder === file.id ? 'drag-over' : ''}`}
-                                    draggable={!file.is_folder}
-                                    onDragStart={(e) => handleDragStart(e, file)}
-                                    onDragOver={(e) => file.is_folder && handleDragOver(e, file)}
-                                    onDragLeave={() => file.is_folder && handleDragLeave()}
-                                    onDrop={(e) => file.is_folder && handleDrop(e, file)}
-                                    onDoubleClick={() => file.is_folder && navigateToFolder(file)}
-                                    onClick={() => file.is_folder && navigateToFolder(file)}
+                                    className={`fm-item-row ${dragOverFolderId === file.id ? 'drag-over' : ''}`}
+                                    onClick={() => handleFileClick(file)}
+                                    draggable
+                                    onDragStart={() => handleDragStart(file)}
+                                    onDragEnd={() => setDraggingFile(null)}
+                                    onDragOver={(e) => handleDragOver(e, file)}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={(e) => handleDrop(e, file)}
                                 >
                                     <td>
                                         <div className="fm-name-cell">
@@ -392,6 +409,55 @@ const FileManager: React.FC = () => {
                     </table>
                 )}
             </main>
+
+            {/* File Preview Modal */}
+            {previewFile && previewUrl && (
+                <div className="fm-modal-overlay" onClick={() => { setPreviewFile(null); setPreviewUrl(null); }}>
+                    <div className="fm-preview-container" onClick={e => e.stopPropagation()}>
+                        <div className="fm-preview-content">
+                            {previewFile.mime_type.startsWith('image/') ? (
+                                <img src={previewUrl} alt={previewFile.name} />
+                            ) : previewFile.mime_type === 'application/pdf' ? (
+                                <iframe src={previewUrl} title={previewFile.name} />
+                            ) : (
+                                <div className="fm-no-preview">
+                                    <File size={64} />
+                                    <p>No preview available for this file type</p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="fm-preview-sidebar">
+                            <div className="sidebar-header">
+                                <h3>File Details</h3>
+                                <button className="close-btn" onClick={() => { setPreviewFile(null); setPreviewUrl(null); }}><Plus size={20} style={{ transform: 'rotate(45deg)' }} /></button>
+                            </div>
+                            <div className="sidebar-info">
+                                <div className="info-group">
+                                    <label>Name</label>
+                                    <span>{previewFile.name}</span>
+                                </div>
+                                <div className="info-group">
+                                    <label>Type</label>
+                                    <span>{previewFile.mime_type}</span>
+                                </div>
+                                <div className="info-group">
+                                    <label>Size</label>
+                                    <span>{(previewFile.size / 1024 / 1024).toFixed(2)} MB</span>
+                                </div>
+                                <div className="info-group">
+                                    <label>Modified</label>
+                                    <span>{new Date(previewFile.updated_at).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div className="sidebar-actions">
+                                <button className="fm-btn primary" onClick={() => downloadFile(previewFile)}>
+                                    <Download size={16} /> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* New Folder Modal */}
             {showNewFolderModal && (
@@ -848,8 +914,111 @@ const FileManager: React.FC = () => {
                     cursor: grab;
                 }
 
-                [draggable="true"]:active {
-                    cursor: grabbing;
+                .fm-preview-container {
+                    width: 90vw;
+                    height: 85vh;
+                    background: var(--bg-card);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--border-color);
+                    border-radius: 24px;
+                    display: flex;
+                    overflow: hidden;
+                    box-shadow: 0 50px 100px rgba(0,0,0,0.4);
+                }
+
+                .fm-preview-content {
+                    flex: 1;
+                    background: #000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                }
+
+                .fm-preview-content img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                }
+
+                .fm-preview-content iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                    background: white;
+                }
+
+                .fm-preview-sidebar {
+                    width: 320px;
+                    background: var(--bg-card);
+                    border-left: 1px solid var(--border-color);
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .fm-preview-sidebar .sidebar-header {
+                    padding: 24px;
+                    border-bottom: 1px solid var(--border-color);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .fm-preview-sidebar .sidebar-header h3 {
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 800;
+                }
+
+                .fm-preview-sidebar .sidebar-info {
+                    padding: 24px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    flex: 1;
+                }
+
+                .fm-preview-sidebar .info-group label {
+                    display: block;
+                    font-size: 11px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    color: var(--text-muted);
+                    margin-bottom: 6px;
+                    letter-spacing: 0.5px;
+                }
+
+                .fm-preview-sidebar .info-group span {
+                    font-size: 14px;
+                    font-weight: 600;
+                    word-break: break-all;
+                }
+
+                .fm-preview-sidebar .sidebar-actions {
+                    padding: 24px;
+                    border-top: 1px solid var(--border-color);
+                }
+
+                .fm-preview-sidebar .sidebar-actions button {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .fm-no-preview {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 16px;
+                    color: #52525b;
+                }
+
+                .close-btn {
+                    background: none;
+                    border: none;
+                    color: var(--text-muted);
+                    cursor: pointer;
+                    display: flex;
+                    padding: 4px;
                 }
             `}</style>
         </div>

@@ -351,29 +351,29 @@ const ProjectDetails = () => {
 
     const getPriorityLabel = (priority: string) => {
         switch (priority) {
-            case 'urgent': return 'Important';
-            case 'high': return 'High Priority';
-            case 'medium': return 'Meh';
-            case 'low': return 'OK';
+            case 'urgent': return 'Urgent / Important';
+            case 'high': return 'High priority';
+            case 'medium': return 'Medium (Meh)';
+            case 'low': return 'Standard (OK)';
             default: return 'Standard';
         }
     };
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {
-            case 'urgent': return '#8E44AD'; // Purple
-            case 'high': return '#E67E22'; // Orange
-            case 'medium': return '#3498DB'; // Blue
-            case 'low': return '#27AE60'; // Green
-            default: return '#95A5A6';
+            case 'urgent': return '#8B5CF6';
+            case 'high': return '#F59E0B';
+            case 'medium': return '#6232FF';
+            case 'low': return '#10B981';
+            default: return '#71717A';
         }
     };
 
     const columns: { id: Task['status']; label: string; color: string }[] = [
-        { id: 'todo', label: 'To Do', color: '#8E44AD' },
-        { id: 'in_progress', label: 'In Progress', color: '#E67E22' },
-        { id: 'review', label: 'Review', color: '#3498DB' },
-        { id: 'done', label: 'Completed', color: '#27AE60' }
+        { id: 'todo', label: 'To Do', color: '#8B5CF6' },
+        { id: 'in_progress', label: 'In Progress', color: '#F59E0B' },
+        { id: 'review', label: 'Review', color: '#6232FF' },
+        { id: 'done', label: 'Completed', color: '#10B981' }
     ];
 
     const getAssignee = (empId: string) => {
@@ -518,7 +518,7 @@ const ProjectDetails = () => {
             </div>
 
             {/* Facebook-style Cover Banner */}
-            <div className="project-cover-banner" style={{ height: '140px', backgroundImage: project?.cover_image ? `url(${project.cover_image})` : 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)' }}>
+            <div className="project-cover-banner" style={{ backgroundImage: project?.cover_image ? `url(${project.cover_image})` : 'linear-gradient(135deg, #27272A 0%, #18181B 100%)' }}>
                 <label className="banner-edit-btn" title="Change Cover Image">
                     <Upload size={14} /> {project?.cover_image ? 'Update Cover' : 'Add Cover'}
                     <input type="file" hidden accept="image/*" onChange={(e) => {
@@ -552,15 +552,15 @@ const ProjectDetails = () => {
                     <div className="proj-title-area">
                         <div className="badge-status">Active Project</div>
                         {isEditingProject ? (
-                            <div className="title-edit-form" style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                                <input autoFocus className="title-input-v3" value={editingProjectName} onChange={e => setEditingProjectName(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSaveTitle()} style={{ fontSize: '20px', fontWeight: 800, padding: '4px 8px', border: '1px solid #10B981', borderRadius: '8px', outline: 'none' }} />
-                                <button className="btn-save-title" onClick={handleSaveTitle} style={{ background: '#10B981', color: 'white', border: 'none', padding: '0 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Save</button>
-                                <button className="btn-cancel-title" onClick={() => setIsEditingProject(false)} style={{ background: 'transparent', color: '#EF4444', border: '1px solid currentColor', padding: '0 12px', borderRadius: '8px', cursor: 'pointer' }}>Cancel</button>
+                            <div className="title-edit-form" style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                                <input autoFocus className="form-group-v2 input" value={editingProjectName} onChange={e => setEditingProjectName(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSaveTitle()} style={{ fontSize: '24px', fontWeight: 800, width: '400px' }} />
+                                <button className="btn-create-v2" onClick={handleSaveTitle}>Save</button>
+                                <button className="btn-cancel-v2" onClick={() => setIsEditingProject(false)}>Cancel</button>
                             </div>
                         ) : (
-                            <div className="title-display-v3" onClick={() => { setEditingProjectName(project?.name || ''); setIsEditingProject(true); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', marginBottom: '12px' }} title="Click to edit project name">
-                                <h1 style={{ margin: 0, fontSize: '26px' }}>{project?.name || 'Loading Project...'}</h1>
-                                <Edit2 size={16} className="edit-icon" style={{ color: '#94A3B8' }} />
+                            <div className="title-display-v3" onClick={() => { setEditingProjectName(project?.name || ''); setIsEditingProject(true); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', marginBottom: '24px' }} title="Click to edit project name">
+                                <h1>{project?.name || 'Loading Project...'}</h1>
+                                <Edit2 size={18} className="edit-icon" style={{ color: '#94A3B8', opacity: 0.6 }} />
                             </div>
                         )}
                         <div className="view-selector">
@@ -923,13 +923,12 @@ const ProjectDetails = () => {
 
             <style>{`
         .kanban-page.premium {
-          padding: 0;
-          height: 100vh;
-          background: #F8FAFC;
+          min-height: 100vh;
           display: flex;
           flex-direction: column;
           font-family: 'Inter', system-ui, -apple-system, sans-serif;
-          color: #1E293B;
+          background: #FAFAFA;
+          color: #18181B;
           transition: background 0.3s ease;
         }
         .dark .kanban-page.premium { background: #09090B; color: #FAFAFA; }
@@ -944,18 +943,18 @@ const ProjectDetails = () => {
           border-bottom: 1.5px solid rgba(0,0,0,0.05);
           position: sticky;
           top: 0;
-          z-index: 100;
+          z-index: 1000;
         }
-        .dark .kanban-top-nav { background: rgba(9, 9, 11, 0.8); border-color: rgba(255,255,255,0.05); }
+        .dark .kanban-top-nav { background: rgba(9, 9, 11, 0.8); border-color: rgba(255, 255, 255, 0.08); }
 
-        .breadcrumb-v2 { display: flex; align-items: center; gap: 8px; color: #64748B; font-size: 13px; font-weight: 600; }
-        .breadcrumb-v2 .sep { color: #CBD5E1; opacity: 0.5; }
+        .breadcrumb-v2 { display: flex; align-items: center; gap: 8px; color: #71717A; font-size: 13px; font-weight: 600; }
+        .breadcrumb-v2 .sep { color: #E4E4E7; opacity: 0.5; }
         .current-proj { color: #6232FF; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
         .nav-right { display: flex; align-items: center; gap: 24px; }
-        .search-pill { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #64748B; cursor: pointer; border-radius: 50%; transition: 0.2s; background: #F1F5F9; }
+        .search-pill { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #71717A; cursor: pointer; border-radius: 50%; transition: 0.2s; background: #F4F4F5; }
         .dark .search-pill { background: rgba(255, 255, 255, 0.05); color: #A1A1AA; }
-        .search-pill:hover { background: #E2E8F0; color: #1E293B; }
+        .search-pill:hover { background: #E4E4E7; color: #18181B; }
         .dark .search-pill:hover { background: rgba(255, 255, 255, 0.1); color: white; }
 
         .avatar-stack-nav { display: flex; align-items: center; }
@@ -963,23 +962,41 @@ const ProjectDetails = () => {
         .dark .nav-avatar { border-color: #09090B; }
         .nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .nav-avatar span { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 11px; font-weight: 800; }
-        .avatar-more { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid white; margin-left: -10px; background: #F8FAFB; color: #475569; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .avatar-more { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid white; margin-left: -10px; background: #FAFAFA; color: #52525B; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .dark .avatar-more { border-color: #09090B; background: #18181B; color: white; }
 
-        .btn-invite { background: #F1F5F9; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13px; color: #475569; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-invite { background: #F4F4F5; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13px; color: #52525B; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
         .dark .btn-invite { background: rgba(255, 255, 255, 0.05); color: #FAFAFA; }
-        .btn-invite:hover { background: #E2E8F0; color: #1E293B; }
+        .btn-invite:hover { background: #E4E4E7; color: #18181B; }
         .dark .btn-invite:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .project-cover-banner { 
+          width: 100%; 
+          height: 200px; 
+          background-size: cover; 
+          background-position: center; 
+          position: relative; 
+          border-bottom: 2.5px solid rgba(0,0,0,0.05);
+          flex-shrink: 0;
+        }
+        .dark .project-cover-banner { border-bottom-color: rgba(255, 255, 255, 0.08); }
+
+        .banner-edit-btn { position: absolute; bottom: 24px; right: 32px; background: rgba(255,255,255,0.9); padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 800; color: #18181B; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.2s; backdrop-filter: blur(10px); border: 1px solid white; }
+        .banner-edit-btn:hover { background: white; transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        .banner-remove-btn { position: absolute; bottom: 24px; right: 210px; background: rgba(239, 68, 68, 0.9); padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 800; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2); transition: 0.2s; backdrop-filter: blur(10px); }
+        .banner-remove-btn:hover { background: #EF4444; transform: translateY(-2px); }
+        .dark .banner-edit-btn { background: rgba(24, 24, 27, 0.85); color: white; border-color: rgba(255,255,255,0.1); }
+        .dark .banner-edit-btn:hover { background: rgba(24, 24, 27, 1); }
 
         .project-sub-header { padding: 40px 32px 32px 32px; display: flex; justify-content: space-between; align-items: flex-end; }
         .badge-status { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #10B981; background: rgba(16, 185, 129, 0.1); padding: 6px 14px; border-radius: 20px; width: fit-content; margin-bottom: 12px; }
         
-        .proj-title-area h1 { font-size: 40px; font-weight: 950; margin: 0 0 24px 0; letter-spacing: -1.5px; color: #1E293B; }
+        .proj-title-area h1 { font-size: 40px; font-weight: 950; margin: 0 0 24px 0; letter-spacing: -1.5px; color: #18181B; }
         .dark .proj-title-area h1 { color: white; }
         
-        .view-selector { display: flex; background: #F1F5F9; padding: 5px; border-radius: 16px; gap: 5px; width: fit-content; border: 1.5px solid rgba(0,0,0,0.02); }
-        .dark .view-selector { background: rgba(24, 24, 27, 0.6); border-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        .view-selector button { border: none; background: transparent; padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #64748B; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .view-selector { display: flex; background: #F4F4F5; padding: 5px; border-radius: 16px; gap: 5px; width: fit-content; border: 1.5px solid rgba(0,0,0,0.02); }
+        .dark .view-selector { background: rgba(24, 24, 27, 0.6); border-color: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); }
+        .view-selector button { border: none; background: transparent; padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #71717A; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
         .view-selector button.active { background: white; color: #6232FF; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .dark .view-selector button.active { background: #6232FF; color: white; box-shadow: 0 4px 15px rgba(98, 50, 255, 0.3); }
 
@@ -995,67 +1012,78 @@ const ProjectDetails = () => {
         .btn-delete-proj { background: transparent; color: #EF4444; border: 1.5px solid rgba(239, 68, 68, 0.2); padding: 14px 24px; border-radius: 16px; font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
         .btn-delete-proj:hover { background: rgba(239, 68, 68, 0.05); border-color: #EF4444; }
 
-        /* Checklist CSS */
-        .cl-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: white; border: 1.5px solid #E2E8F0; border-radius: 14px; transition: 0.2s; }
-        .cl-item:hover { border-color: #6232FF33; background: #F8FAFC; }
-        .dark .cl-item { background: rgba(24, 24, 27, 0.45); border-color: rgba(255, 255, 255, 0.06); }
-        .cl-item.completed { background: #F1F5F9; border-color: transparent; }
-        .dark .cl-item.completed { background: rgba(24, 24, 27, 0.2); }
+        /* Board UI Improvements */
+        .kanban-board-v2 { display: flex; gap: 32px; padding: 0 32px 64px 32px; min-height: calc(100vh - 350px); overflow-x: auto; }
         
-        .cl-checkbox { width: 20px; height: 20px; cursor: pointer; border-radius: 6px; border: 2px solid #CBD5E1; transition: 0.2s; accent-color: #6232FF; }
-        .dark .cl-checkbox { border-color: rgba(255, 255, 255, 0.2); }
-        .cl-text { flex: 1; font-size: 15px; font-weight: 600; color: #1E293B; transition: 0.2s; }
-        .dark .cl-text { color: #FAFAFA; }
-        .cl-item.completed .cl-text { color: #71717A; text-decoration: line-through; }
-        
-        .cl-del { background: none; border: none; color: #CBD5E1; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; transition: 0.2s; }
-        .cl-del:hover { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
-
-        .cl-input { flex: 1; background: #F1F5F9; border: 1.5px solid transparent; border-radius: 14px; padding: 14px 18px; font-size: 15px; font-weight: 600; outline: none; transition: 0.2s; color: #1E293B; }
-        .cl-input:focus { background: white; border-color: #6232FF; box-shadow: 0 0 0 4px rgba(98, 50, 255, 0.08); }
-        .dark .cl-input { background: rgba(24, 24, 27, 0.6); border-color: rgba(255, 255, 255, 0.05); color: white; }
-        .dark .cl-input:focus { background: rgba(24, 24, 27, 0.8); border-color: #6232FF; }
-
-        .project-cover-banner { height: 180px; width: 100%; background-size: cover; background-position: center; position: relative; border-bottom: 2px solid rgba(0,0,0,0.02); }
-        .banner-edit-btn { position: absolute; bottom: 20px; right: 32px; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; color: #1E293B; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: 0.2s; backdrop-filter: blur(10px); border: 1px solid white; }
-        .banner-edit-btn:hover { background: white; transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-        .banner-remove-btn { position: absolute; bottom: 20px; right: 200px; background: rgba(239, 68, 68, 0.9); padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2); transition: 0.2s; backdrop-filter: blur(10px); }
-        .banner-remove-btn:hover { background: #EF4444; transform: translateY(-2px); }
-        .dark .banner-edit-btn { background: rgba(24, 24, 27, 0.85); color: white; border-color: rgba(255,255,255,0.1); }
-        .dark .banner-edit-btn:hover { background: rgba(24, 24, 27, 1); }
-
-        .title-display-v3:hover h1 { color: #6232FF; }
-        .title-display-v3:hover .edit-icon { color: #6232FF !important; }
-
-        .cl-add-btn { background: #1E293B; color: white; border: none; padding: 0 24px; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; }
-        .dark .cl-add-btn { background: #6232FF; }
-        .cl-add-btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.1); }
-
-        /* Task Card Overhaul */
-        .task-card-v3 {
-          background: white;
-          border-radius: 20px;
-          padding: 24px;
-          border: 1.5px solid rgba(0,0,0,0.02);
-          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          cursor: grab;
-          overflow: hidden;
+        .kanban-column-v2 { 
+          flex: 1; min-width: 340px; display: flex; flex-direction: column; gap: 20px; 
+          background: rgba(0,0,0,0.02); border-radius: 24px; padding: 16px; transition: 0.3s;
         }
-        .dark .task-card-v3 { background: rgba(24, 24, 27, 0.45); border-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        .task-card-v3:hover:not(.is-dragging) { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); border-color: rgba(98, 50, 255, 0.2); }
-        .dark .task-card-v3:hover:not(.is-dragging) { border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+        .dark .kanban-column-v2 { background: rgba(255, 255, 255, 0.02); }
+        .kanban-column-v2.drag-active { background: rgba(98, 50, 255, 0.05); }
+
+        .column-header-v2 { 
+          display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 8px;
+        }
+        .col-title-group { display: flex; align-items: center; gap: 12px; }
+        .col-title-group .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .col-title-group h3 { font-size: 16px; font-weight: 900; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .col-title-group .count { 
+          font-size: 11px; background: rgba(0,0,0,0.05); padding: 2px 10px; border-radius: 8px; color: #71717A; font-weight: 800;
+        }
+        .dark .col-title-group .count { background: rgba(255, 255, 255, 0.1); color: #A1A1AA; }
+
+        .btn-col-more {
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          border: none;
+          background: transparent;
+          color: #71717A;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .dark .btn-col-more { color: #A1A1AA; }
+        .btn-col-more:hover { background: rgba(0,0,0,0.05); color: #18181B; }
+        .dark .btn-col-more:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        .column-cards-v2 { display: flex; flex-direction: column; gap: 16px; }
+
+        .btn-add-card-inline { 
+          width: 100%; border: 2px dashed #E4E4E7; padding: 16px; border-radius: 20px; background: transparent; 
+          color: #A1A1AA; font-weight: 850; font-size: 13px; display: flex; align-items: center; 
+          justify-content: center; gap: 10px; cursor: pointer; transition: 0.3s;
+        }
+        .dark .btn-add-card-inline { border-color: rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.01); }
+        .btn-add-card-inline:hover { 
+          background: rgba(98, 50, 255, 0.05); border-color: #6232FF; color: #6232FF; transform: scale(1.02);
+        }
+        .dark .btn-add-card-inline:hover { background: rgba(98, 50, 255, 0.1); color: #8B5CF6; border-color: #8B5CF6; }
+
+        .task-card-v3 { 
+          background: white; border-radius: 24px; padding: 24px; border: 1.5px solid rgba(0,0,0,0.02); 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+        }
+        .dark .task-card-v3 { 
+            background: rgba(24, 24, 27, 0.6); 
+            border-color: rgba(255, 255, 255, 0.06); 
+            backdrop-filter: blur(10px);
+        }
+        .task-card-v3:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: rgba(98, 50, 255, 0.15); }
+        .dark .task-card-v3:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-color: rgba(255, 255, 255, 0.1); }
 
         .card-header-v3 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-priority-v3 { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .status-selector-minimal { background: #F1F5F9; border: none; padding: 8px 14px; border-radius: 10px; font-size: 11px; font-weight: 800; color: #64748B; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .status-selector-minimal { background: #F4F4F5; border: none; padding: 8px 14px; border-radius: 10px; font-size: 11px; font-weight: 800; color: #71717A; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .dark .status-selector-minimal { background: rgba(255, 255, 255, 0.05); color: #A1A1AA; }
-        .status-selector-minimal:hover { background: #E2E8F0; color: #1E293B; }
+        .status-selector-minimal:hover { background: #E4E4E7; color: #18181B; }
         .dark .status-selector-minimal:hover { background: rgba(255, 255, 255, 0.1); color: white; }
 
-        .custom-dropdown-menu { position: absolute; top: calc(100% + 10px); right: 0; background: white; border: 1.5px solid rgba(0,0,0,0.05); border-radius: 16px; padding: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 180px; z-index: 150; }
+        .custom-dropdown-menu { position: absolute; top: calc(100% + 10px); right: 0; background: white; border: 1.5px solid rgba(0,0,0,0.05); border-radius: 16px; padding: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 180px; z-index: 1500; }
         .dark .custom-dropdown-menu { background: #18181B; border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
 
         .dropdown-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; color: #64748B; transition: 0.2s; }
@@ -1063,7 +1091,7 @@ const ProjectDetails = () => {
         .dropdown-item:hover { background: #F1F5F9; color: #1E293B; }
         .dark .dropdown-item:hover { background: rgba(255, 255, 255, 0.05); color: white; }
 
-        .card-title-v3 { font-size: 17px; font-weight: 800; color: #1E293B; margin: 0 0 20px 0; line-height: 1.4; letter-spacing: -0.5px; }
+        .card-title-v3 { font-size: 17px; font-weight: 800; color: #18181B; margin: 0 0 20px 0; line-height: 1.4; letter-spacing: -0.5px; }
         .dark .card-title-v3 { color: #FAFAFA; }
 
         .card-progress-v3 { margin-bottom: 24px; }
@@ -1074,37 +1102,49 @@ const ProjectDetails = () => {
         .card-footer-v3 { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1.5px solid rgba(0,0,0,0.02); }
         .dark .card-footer-v3 { border-top-color: rgba(255, 255, 255, 0.05); }
 
+        .assignee-wrap { display: flex; align-items: center; gap: 8px; }
         .assignee-wrap .fallback-avatar, .assignee-wrap img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .dark .assignee-wrap .fallback-avatar, .dark .assignee-wrap img { border-color: #09090B; }
         .assignee-wrap span { font-size: 13px; font-weight: 700; color: #64748B; }
 
-        .btn-add-card-inline { border: 1.5px dashed #E2E8F0; padding: 14px; border-radius: 16px; color: #94A3B8; font-weight: 800; margin-top: 8px; }
-        .dark .btn-add-card-inline { border-color: rgba(255, 255, 255, 0.1); }
-        .btn-add-card-inline:hover { background: rgba(98, 50, 255, 0.05); border-color: #6232FF; color: #6232FF; }
-
-        /* Modal Redesign */
-        .modal-overlay { background: rgba(9, 9, 11, 0.7); backdrop-filter: blur(15px); }
-        .modal-content.glass-v2 { max-width: 550px; background: white; border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.25); }
+        /* Modal Styles */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(9, 9, 11, 0.7); backdrop-filter: blur(12px); 
+            display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+        }
+        .modal-content.glass-v2 { 
+            width: 100%; max-width: 540px; background: white; border-radius: 32px; 
+            box-shadow: 0 30px 100px rgba(0,0,0,0.4); display: flex; flex-direction: column; 
+            border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
+        }
         .dark .modal-content.glass-v2 { background: #111114; border-color: rgba(255, 255, 255, 0.05); }
 
-        .modal-header-v2 { padding: 40px 40px 32px 40px; border-bottom: 1.5px solid rgba(0,0,0,0.02); }
+        .modal-header-v2 { padding: 32px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(0,0,0,0.02); }
         .dark .modal-header-v2 { border-bottom-color: rgba(255, 255, 255, 0.05); }
-        .modal-header-v2 h3 { font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+        .modal-header-v2 h3 { margin: 0; font-size: 24px; font-weight: 900; }
 
-        .modal-body-v2 { padding: 40px; gap: 32px; }
-        .form-group-v2 input, .form-group-v2 textarea, .form-group-v2 select { 
-          background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 16px 20px; font-weight: 600; 
+        .modal-body-v2 { padding: 40px; display: flex; flex-direction: column; gap: 24px; }
+        .form-group-v2 { display: flex; flex-direction: column; gap: 8px; }
+        .form-group-v2 label { font-size: 13px; font-weight: 800; color: #71717A; text-transform: uppercase; }
+        .form-group-v2 input, .form-group-v2 select, .form-group-v2 textarea { 
+            background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 14px 18px; 
+            font-size: 15px; font-weight: 600; color: #18181B; outline: none; transition: 0.2s;
         }
-        .dark .form-group-v2 input, .dark .form-group-v2 textarea, .dark .form-group-v2 select {
-          background: rgba(0, 0, 0, 0.2); border-color: rgba(255, 255, 255, 0.1); color: white;
+        .dark .form-group-v2 input, .dark .form-group-v2 select, .dark .form-group-v2 textarea { 
+            background: rgba(0, 0, 0, 0.2); border-color: rgba(255, 255, 255, 0.1); color: white; 
         }
+        .form-group-v2 input:focus, .form-group-v2 select:focus, .form-group-v2 textarea:focus { border-color: #6232FF; }
 
-        .modal-footer-v2 { padding: 32px 40px 40px 40px; background: #F8FAFC; border-top: 1.5px solid rgba(0,0,0,0.02); }
-        .dark .modal-footer-v2 { background: #111114; border-top-color: rgba(255, 255, 255, 0.05); }
-        
-        .btn-create-v2 { background: linear-gradient(135deg, #6232FF 0%, #5D3FD3 100%); padding: 14px 32px; border-radius: 16px; font-weight: 800; font-size: 15px; }
+        .modal-footer-v2 { padding: 32px 40px; display: flex; justify-content: flex-end; gap: 16px; background: #F8FAFC; border-top: 1.5px solid rgba(0,0,0,0.02); }
+        .dark .modal-footer-v2 { background: rgba(0,0,0,0.2); border-top-color: rgba(255, 255, 255, 0.05); }
 
-        .kanban-board-scroll { padding: 0 32px 64px 32px; }
+        .btn-create-v2 { background: #6232FF; color: white; border: none; padding: 14px 32px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-cancel-v2 { background: transparent; color: #71717A; border: none; font-weight: 700; cursor: pointer; }
+
+        .close-btn-v2 { background: #F4F4F5; border: none; color: #71717A; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .dark .close-btn-v2 { background: rgba(255, 255, 255, 0.05); }
+
+        .kanban-board-scroll { padding: 0 0 64px 0; overflow-x: auto; flex: 1; }
       `}</style>
         </div>
     );
