@@ -35,6 +35,7 @@ import ProjectDetails from './pages/ProjectDetails.tsx';
 import EmployeeProjects from './pages/EmployeeProjects.tsx';
 import EmployeeProjectDetails from './pages/EmployeeProjectDetails.tsx';
 import EmployeeTasks from './pages/EmployeeTasks.tsx';
+import FileManager from './pages/FileManager.tsx';
 
 // Admin Layout Wrapper
 const AdminLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
@@ -74,6 +75,7 @@ const AdminRoutes = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleT
         <Route path="calendar" element={<Calendar />} />
         <Route path="projects" element={<Projects />} />
         <Route path="projects/:id" element={<ProjectDetails />} />
+        <Route path="file-manager" element={<FileManager />} />
         <Route path="*" element={<Navigate to="/Admin" replace />} />
       </Route>
     </Routes>

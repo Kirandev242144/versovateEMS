@@ -14,7 +14,8 @@ import {
   ChevronDown,
   CreditCard,
   FolderKanban,
-  ListTodo
+  ListTodo,
+  Folder
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -60,6 +61,7 @@ const adminNavItems: NavItem[] = [
   { icon: Banknote, label: 'Payroll', path: '/Admin/payroll' },
   { icon: Settings, label: 'Payroll Settings', path: '/Admin/payroll-settings' },
   { icon: UserPlus, label: 'Recruitments', path: '/Admin/recruitments' },
+  { icon: Folder, label: 'File Manager', path: '/Admin/file-manager' },
 ];
 
 const employeeNavItems: NavItem[] = [
