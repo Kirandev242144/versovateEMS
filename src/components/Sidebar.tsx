@@ -213,7 +213,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isDarkMode }) => {
         .logo-text {
           font-size: 22px;
           font-weight: 800;
-          color: #000000;
+          color: var(--text-primary);
           letter-spacing: -0.5px;
         }
 

@@ -500,8 +500,8 @@ const Projects = () => {
             overflow: hidden;
         }
         .dark .project-card-v3 { 
-            background: rgba(15, 23, 42, 0.4); 
-            border-color: rgba(255, 255, 255, 0.05); 
+            background: rgba(24, 24, 27, 0.45); 
+            border-color: rgba(255, 255, 255, 0.06); 
             backdrop-filter: blur(15px);
         }
         .project-card-v3::before {
@@ -527,9 +527,9 @@ const Projects = () => {
         .dark .btn-more-v2:hover { background: rgba(255, 255, 255, 0.1); color: white; }
 
         .p-name { font-size: 24px; font-weight: 800; color: #1E293B; margin: 0 0 12px 0; letter-spacing: -0.8px; }
-        .dark .p-name { color: #F8FAFB; }
+        .dark .p-name { color: #FAFAFA; }
         .p-description { font-size: 14px; color: #64748B; margin: 0 0 36px 0; line-height: 1.6; height: 44px; overflow: hidden; flex: 1; opacity: 0.8; }
-        .dark .p-description { color: #94A3B8; }
+        .dark .p-description { color: #A1A1AA; }
 
         .p-progress-section { margin-bottom: 36px; }
         .prog-text { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: #94A3B8; margin-bottom: 12px; }
@@ -542,20 +542,20 @@ const Projects = () => {
 
         .p-team { display: flex; align-items: center; }
         .t-avatar { width: 34px; height: 34px; border-radius: 50%; background: #6232FF; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 2.5px solid white; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .dark .t-avatar { border-color: #0F172A; }
+        .dark .t-avatar { border-color: #09090B; }
         .t-count { margin-left: 10px; font-size: 13px; font-weight: 700; color: #94A3B8; }
 
         .p-due { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #94A3B8; }
 
         /* Modal Enhancements */
         .modal-overlay { 
-          position: fixed; inset: 0; background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 1000;
+          position: fixed; inset: 0; background: rgba(9, 9, 11, 0.7); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 1000;
         }
 
         .modal-content.glass { 
           width: 95%; max-width: 650px; background: white; border-radius: 32px; border: 1.5px solid rgba(255, 255, 255, 0.1); box-shadow: 0 50px 100px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; max-height: 92vh;
         }
-        .dark .modal-content.glass { background: #0F172A; border-color: rgba(255, 255, 255, 0.05); }
+        .dark .modal-content.glass { background: #111114; border-color: rgba(255, 255, 255, 0.05); }
 
         .modal-header { padding: 40px 40px 32px 40px; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h3 { font-size: 28px; font-weight: 800; color: #1E293B; letter-spacing: -1px; }
@@ -569,7 +569,7 @@ const Projects = () => {
         
         .form-group label { font-size: 12px; font-weight: 800; color: #94A3B8; margin-bottom: 12px; display: block; letter-spacing: 0.8px; text-transform: uppercase; }
         .form-group input, .form-group textarea { width: 100%; background: #F8FAFB; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 16px 20px; font-size: 15px; font-weight: 600; color: #1E293B; outline: none; transition: all 0.3s; }
-        .dark .form-group input, .dark .form-group textarea { background: rgba(2, 6, 23, 0.4); border-color: rgba(255,255,255,0.1); color: white; }
+        .dark .form-group input, .dark .form-group textarea { background: rgba(0, 0, 0, 0.2); border-color: rgba(255,255,255,0.1); color: white; }
         .form-group input:focus { border-color: #6232FF; box-shadow: 0 0 0 5px rgba(98, 50, 255, 0.1); background: white; }
         .dark .form-group input:focus { background: rgba(2, 6, 23, 0.6); }
 

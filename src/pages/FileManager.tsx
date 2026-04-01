@@ -4,22 +4,18 @@ import {
     File,
     Upload,
     Plus,
-    MoreVertical,
     Download,
     Trash2,
     ChevronRight,
     Search,
     Grid,
     List,
-    ArrowLeft,
     Loader2,
     FileText,
     Image as ImageIcon,
     Video,
     Music,
-    Archive,
-    Type,
-    ExternalLink
+    Archive
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -45,7 +41,6 @@ const FileManager: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showNewFolderModal, setShowNewFolderModal] = useState(false);
     const [newFolderName, setNewFolderName] = useState('');
-    const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
 
     const fetchFiles = useCallback(async () => {
         setLoading(true);
@@ -87,7 +82,6 @@ const FileManager: React.FC = () => {
 
             for (let i = 0; i < fileList.length; i++) {
                 const file = fileList[i];
-                const fileExt = file.name.split('.').pop();
                 const fileName = `${Date.now()}-${file.name}`;
                 const filePath = currentFolder ? `${currentFolder}/${fileName}` : fileName;
 
@@ -767,8 +761,8 @@ const FileManager: React.FC = () => {
                 .fm-modal-overlay {
                     position: fixed;
                     inset: 0;
-                    background: rgba(0,0,0,0.3);
-                    backdrop-filter: blur(8px);
+                    background: rgba(9, 9, 11, 0.7);
+                    backdrop-filter: blur(15px);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -779,10 +773,13 @@ const FileManager: React.FC = () => {
                     width: 100%;
                     max-width: 400px;
                     padding: 32px;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-color);
                     border-radius: 24px;
                     display: flex;
                     flex-direction: column;
                     gap: 20px;
+                    box-shadow: var(--shadow-lg);
                 }
 
                 .fm-modal h3 {
