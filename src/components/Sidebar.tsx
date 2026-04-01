@@ -219,6 +219,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isDarkMode }) => {
 
         .sidebar-nav {
           flex: 1;
+          overflow-y: auto;
+          padding-right: 4px;
+          margin: 0 -4px 0 0;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 10px;
         }
 
         .nav-item {

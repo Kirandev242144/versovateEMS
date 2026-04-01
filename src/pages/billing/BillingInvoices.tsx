@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Search, Plus, FileText, Loader2, Download, Trash2, X } from 'lucide-react';
+import { Search, Plus, FileText, Loader2, Download, Trash2, X, Eye } from 'lucide-react';
 import DataError from '../../components/DataError';
 
 interface Client {
@@ -272,7 +272,10 @@ const BillingInvoices = () => {
         }
     };
 
-    const handleDownloadPDF = async (invoice: Invoice) => {
+    const handleDownloadPDF = (invoice: Invoice) => generateInvoicePDF(invoice, false);
+    const handlePreviewPDF = (invoice: Invoice) => generateInvoicePDF(invoice, true);
+
+    const generateInvoicePDF = async (invoice: Invoice, preview: boolean = false) => {
         try {
             // Fetch invoice items
             const { data: items, error: itemsError } = await supabase.from('invoice_items').select('*').eq('invoice_id', invoice.id);
@@ -471,10 +474,7 @@ const BillingInvoices = () => {
                                         <span class="bank-value">${bankDetails.branch}</span>
                                     ` : ''}
                                 </div>
-                            ` : `
-                                <h4>Payment Method</h4>
-                                <div style="color: #6b7280; font-size: 12px;">No bank details configured in settings.</div>
-                            `}
+                            ` : ''}
 
                             <div style="margin-top: 24px;">
                                 <h4 style="color: #6D28D9; margin-bottom: 6px;">Terms and Conditions</h4>
@@ -516,8 +516,9 @@ const BillingInvoices = () => {
 
                     <!-- Footer Bar -->
                     <div class="footer-brand">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px;">
-                            <span style="font-size: 24px; letter-spacing: -1px; line-height: 1;">Vi</span> Versovate
+                        <div style="display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px;">
+                            <img src="${window.location.origin}/assets/logo%20png.png" alt="Logo" style="height: 32px; width: auto; object-fit: contain;" />
+                            Versovate
                         </div>
                         <div style="display: flex; gap: 24px; font-size: 12px; color: #4b5563;">
                             <span>info@versovate.com</span>
@@ -539,9 +540,15 @@ const BillingInvoices = () => {
                             jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
                         };
                         
-                        html2pdf().set(opt).from(element).save().then(() => {
-                            setTimeout(() => { window.close(); }, 1000);
-                        });
+                        if (${preview}) {
+                            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                                window.location.href = pdf.output('bloburl');
+                            });
+                        } else {
+                            html2pdf().set(opt).from(element).save().then(() => {
+                                setTimeout(() => { window.close(); }, 1000);
+                            });
+                        }
                     }
                 </script>
             </body>
@@ -684,9 +691,14 @@ const BillingInvoices = () => {
                                             <StatusBadge status={inv.status} />
                                         </td>
                                         <td style={{ textAlign: 'right' }}>
-                                            <button onClick={() => handleDownloadPDF(inv)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} title="Download Invoice PDF">
-                                                <Download size={18} />
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                <button onClick={() => handlePreviewPDF(inv)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} title="Preview Invoice">
+                                                    <Eye size={18} />
+                                                </button>
+                                                <button onClick={() => handleDownloadPDF(inv)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }} title="Download Invoice PDF">
+                                                    <Download size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
