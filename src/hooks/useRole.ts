@@ -50,7 +50,7 @@ export function useRole(userId: string | undefined) {
                     // Default permissions if join fails
                     const defaultPerms = data.role === 'admin'
                         ? { all: true }
-                        : { dashboard: true, attendance: true, leaves: true, payroll: true, profile: true };
+                        : { dashboard: true, attendance: true, leaves: true, payroll: true, profile: true, projects: true, 'my-tasks': true };
 
                     const perms = (data.roles as any)?.permissions || defaultPerms;
 

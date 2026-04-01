@@ -30,6 +30,11 @@ import Settings from './pages/Settings.tsx';
 import Inbox from './pages/Inbox.tsx';
 import Recruitments from './pages/Recruitments.tsx';
 import Calendar from './pages/Calendar.tsx';
+import Projects from './pages/Projects.tsx';
+import ProjectDetails from './pages/ProjectDetails.tsx';
+import EmployeeProjects from './pages/EmployeeProjects.tsx';
+import EmployeeProjectDetails from './pages/EmployeeProjectDetails.tsx';
+import EmployeeTasks from './pages/EmployeeTasks.tsx';
 
 // Admin Layout Wrapper
 const AdminLayout = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleTheme: () => void }) => {
@@ -67,6 +72,8 @@ const AdminRoutes = ({ isDarkMode, toggleTheme }: { isDarkMode: boolean; toggleT
         <Route path="inbox" element={<Inbox />} />
         <Route path="recruitments" element={<Recruitments />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="projects" element={<Projects />} />
+        <Route path="projects/:id" element={<ProjectDetails />} />
         <Route path="*" element={<Navigate to="/Admin" replace />} />
       </Route>
     </Routes>
@@ -188,6 +195,9 @@ function App() {
           <Route path="payslips" element={<EmployeePayslips />} />
           <Route path="leaves" element={<EmployeeLeaves />} />
           <Route path="profile" element={<MyProfile />} />
+          <Route path="projects" element={<EmployeeProjects />} />
+          <Route path="projects/:id" element={<EmployeeProjectDetails />} />
+          <Route path="my-tasks" element={<EmployeeTasks />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
 

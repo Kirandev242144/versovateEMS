@@ -12,7 +12,9 @@ import {
   LogOut,
   User,
   ChevronDown,
-  CreditCard
+  CreditCard,
+  FolderKanban,
+  ListTodo
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -39,6 +41,7 @@ interface NavItem {
 
 const adminNavItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/Admin', end: true },
+  { icon: FolderKanban, label: 'Projects', path: '/Admin/projects' },
   { icon: Mail, label: 'Inbox', path: '/Admin/inbox' },
   { icon: Calendar, label: 'Calendar', path: '/Admin/calendar' },
   { icon: Users, label: 'Employees', path: '/Admin/employees' },
@@ -61,6 +64,8 @@ const adminNavItems: NavItem[] = [
 
 const employeeNavItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'My Dashboard', path: '/', end: true },
+  { icon: FolderKanban, label: 'Assigned Projects', path: '/projects' },
+  { icon: ListTodo, label: 'My Tasks', path: '/my-tasks' },
   { icon: Clock, label: 'Attendance', path: '/attendance' },
   { icon: Banknote, label: 'My Payslips', path: '/payslips' },
   { icon: Calendar, label: 'Leaves', path: '/leaves' },
@@ -82,9 +87,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isDarkMode }) => {
   };
 
   const navItems = React.useMemo(() => {
-    // Treat any custom role as an 'Admin' portal user (Operation Manager, etc.)
-    // Only the default 'employee' role uses the Employee portal
-    const baseItems = role === 'employee' ? employeeNavItems : adminNavItems;
+    // By default, a pure 'employee' sees everything in the Employee Portal.
+    if (role === 'employee') return employeeNavItems;
+
+    // For any custom role (HR Manager, Operation Manager) or 'admin', they use the Admin Portal.
+    // We filter the Admin portal based on their granular permissions matrix.
+    const baseItems = adminNavItems;
 
     if (permissions?.all) return baseItems;
     if (!permissions) return [];
